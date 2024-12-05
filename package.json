@@ -1,0 +1,22 @@
+{
+  "name": "socialapp-nodejs-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MDPater/socialapp-nodejs-backend.git"
+  },
+  "author": "Max de Pater",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MDPater/socialapp-nodejs-backend/issues"
+  },
+  "homepage": "https://github.com/MDPater/socialapp-nodejs-backend#readme",
+  "dependencies": {
+    "express": "^4.21.1"
+  }
+}
