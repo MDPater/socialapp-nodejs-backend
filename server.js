@@ -4,7 +4,8 @@ const port = 3000
 
 app.get('/status', (req, res) => {
     const status = {
-        "status": "running"
+        "status": "running",
+        "version": "1.0.0",
     }
     res.send(status)
 })
