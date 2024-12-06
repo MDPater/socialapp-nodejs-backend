@@ -9,7 +9,7 @@ router.post(
 
 router.post(
     "/login",
-    
+    AuthorizationController.login
 );
 
 module.exports = router;
