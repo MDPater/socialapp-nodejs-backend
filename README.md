@@ -68,9 +68,9 @@ Before setting up the project, ensure you have the following installed:
 
 | Method | Endpoint             | Description               |
 |--------|----------------------|---------------------------|
-| POST   | `/api/auth/register` | Register a new user       |
-| POST   | `/api/auth/login`    | Log in an existing user   |
-| GET    | `/status       `     | status for server         |
+| POST   | `/auth/register` | Register a new user       |
+| POST   | `/auth/login`    | Log in an existing user   |
+| GET    | `/status`     | status for server         |
 
 
 
