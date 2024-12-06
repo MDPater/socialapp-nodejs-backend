@@ -1,6 +1,13 @@
-const express = require('express')
-const app = express()
-const port = 3000
+const express = require("express");
+const app = express();
+const port = 3000;
+const { Sequelize } = require("sequelize");
+
+// Express Routes Import
+const AuthorizationRoutes = require("./authorization/routes");
+
+//db model
+const UserModel = require("./common/models/User");
 
 app.get('/status', (req, res) => {
     const status = {
@@ -10,6 +17,28 @@ app.get('/status', (req, res) => {
     res.send(status)
 })
 
-app.listen(port, () => {
-    console.log(`App listening on Port: ${port}`)
-})
+app.use(express.json());
+
+const sequelize = new Sequelize({
+    dialect: "sqlite",
+    storage: "./storage/data.db", // Path to the file that will store the SQLite DB.
+});
+
+// Initialising the Model on sequelize
+UserModel.initialise(sequelize);
+
+sequelize
+  .sync()
+  .then(() => {
+    console.log("Sequelize Initialised!!");
+
+    // Attaching the Authentication and User Routes to the app.
+    app.use("/auth", AuthorizationRoutes);
+
+    app.listen(port, () => {
+      console.log("Server Listening on PORT:", port);
+    });
+  })
+  .catch((err) => {
+    console.error("Sequelize Initialisation threw an error:", err);
+  });
