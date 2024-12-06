@@ -1,7 +1,9 @@
+require('dotenv').config()
 const express = require("express");
 const app = express();
-const port = 3000;
 const { Sequelize } = require("sequelize");
+const port = process.env.PORT;
+
 
 // Express Routes Import
 const AuthorizationRoutes = require("./authorization/routes");

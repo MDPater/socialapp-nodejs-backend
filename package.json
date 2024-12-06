@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/MDPater/socialapp-nodejs-backend#readme",
   "dependencies": {
+    "dotenv": "^16.4.7",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
     "nodemon": "^3.1.7",
