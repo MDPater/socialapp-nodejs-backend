@@ -1,4 +1,4 @@
-storage/data.db
+storage/*
 
 # Logs
 logs

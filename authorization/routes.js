@@ -7,7 +7,7 @@ const loginPayload = require("./payload/loginPayload");
 const signupPayload = require("./payload/signupPayload");
 
 router.post(
-    "/signup",
+    "/register",
     validatePayload.verify(signupPayload),
     AuthorizationController.register
 );
