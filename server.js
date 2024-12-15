@@ -15,6 +15,7 @@ app.get('/status', (req, res) => {
     const status = {
         "status": "running",
         "version": "1.0.0",
+        "owner": "MDPater"
     }
     res.send(status)
 })
