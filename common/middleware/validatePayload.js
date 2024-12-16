@@ -1,3 +1,4 @@
+const AjvKeywords = require('ajv-keywords');
 const Ajv = require('ajv').default,
     AJV_OPTS = {allErrors: true};
 
@@ -11,6 +12,7 @@ module.exports = {
         return (req, res, next) => {
             const { body } = req;
             const ajv = new Ajv(AJV_OPTS);
+            AjvKeywords(ajv, ['transform']);
             const validate = ajv.compile(payload);
             const isValid = validate(body);
 
@@ -20,9 +22,7 @@ module.exports = {
 
             return res.send({
                 status: false,
-                error: {
-                    message: 'invalid Payload'
-                }
+                error: validate.errors
             });
         }
     }

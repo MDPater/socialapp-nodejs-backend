@@ -7,9 +7,6 @@ const port = process.env.PORT;
 // Express Routes Import
 const AuthorizationRoutes = require("./authorization/routes");
 
-//db model
-const UserModel = require("./common/models/User");
-
 app.get('/status', (req, res) => {
     const status = {
         "status": "running",

@@ -19,6 +19,7 @@
   "homepage": "https://github.com/MDPater/socialapp-nodejs-backend#readme",
   "dependencies": {
     "ajv": "^8.17.1",
+    "ajv-keywords": "^5.1.0",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.1",
