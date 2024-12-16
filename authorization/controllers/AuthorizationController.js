@@ -68,7 +68,6 @@ module.exports = {
         try{
             //check if username exists
             const checkUser = await pool.query(queries.checkUser, [username])
-
             if(checkUser.rows.length === 0){
                 return res.status(400).json({
                     error: "User does not exist"
