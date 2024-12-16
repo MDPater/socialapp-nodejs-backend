@@ -4,12 +4,9 @@ module.exports = {
         username: {
             type: 'string',
             transform: ["trim", "toLowerCase"],
-            minLength: 3,
-            maxLength: 30,
         },
         password: {
             type: 'string',
-            minLength: 8,
             transform: ["trim"],
         },
     },

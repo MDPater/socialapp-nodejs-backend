@@ -3,14 +3,14 @@ module.exports = {
     properties: {
         username: {
             type: "string",
-            transform: ["trim", "toLowerCase"],
             minLength: 3,
             maxLength: 30,
+            transform: ["trim", "toLowerCase"],
         },
         email: {
             type: "string",
+            pattern: "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
             transform: ["trim", "toLowerCase"],
-            pattern: "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
         },
         password: {
             type: "string",
