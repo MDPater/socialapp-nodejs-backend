@@ -44,7 +44,7 @@ module.exports = {
             const userExists = await pool.query(queries.checkUsernameEmail, [username, email]);
 
             if(userExists.rows.length > 0){
-                return res.status(400).json({error: "Username/email already exists"})
+                return res.status(400).json({error: "Username / email already exists"})
             }
             //register user in db and create accessToken
             const newUser = await pool.query(queries.register, [username, email, encryptedPassword]);
