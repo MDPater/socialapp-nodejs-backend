@@ -1,21 +1,27 @@
 module.exports = {
-    type: 'object',
+    type: "object",
     properties: {
         username: {
-            type: 'string'
+            type: "string",
+            minLength: 3,
+            maxLength: 30,
+            transform: ["trim", "toLowerCase"],
         },
         email: {
-            type: 'string',
-            pattern: "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+            type: "string",
+            pattern: "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+            transform: ["trim", "toLowerCase"],
         },
         password: {
-            type: 'string'
+            type: "string",
+            minLength: 8,
+            transform: ["trim"],
         },
     },
     required: [
-        'username',
-        'email',
-        'password'
+        "username",
+        "email",
+        "password"
     ],
     additionalProperties: false
 }

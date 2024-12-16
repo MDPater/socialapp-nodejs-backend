@@ -2,10 +2,12 @@ module.exports = {
     type: 'object',
     properties: {
         username: {
-            type: 'string'
+            type: 'string',
+            transform: ["trim", "toLowerCase"],
         },
         password: {
-            type: 'string'
+            type: 'string',
+            transform: ["trim"],
         },
     },
     required: [

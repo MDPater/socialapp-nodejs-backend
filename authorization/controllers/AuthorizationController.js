@@ -1,11 +1,13 @@
 require('dotenv').config()
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const pool = require('../../db');
+const queries = require('./queries');
+const { error } = require('console');
 
 const jwtSecret = process.env.JWTSECRET;
 const jwtExpirationInSeconds = process.env.JWT_EXPIRATION_IN_SECONDS;
 
-const UserModel = require("../../common/models/User");
 
 //Access Token using username and userId for authentication
 const generateAccessToken = (username, userId) => {
@@ -22,7 +24,7 @@ const generateAccessToken = (username, userId) => {
 };
 
 const encryptPassword = (password) => {
-    // We will hash the password using SHA256 Algorithm
+    // hash the password using SHA256 Algorithm
     const hash = crypto.createHash("sha256");
     // Update the hash object with the string to be encrypted
     hash.update(password);
@@ -33,77 +35,67 @@ const encryptPassword = (password) => {
 module.exports = {
 
     //register User
-    register: (req, res) => {
-        const payload = req.body;
-        let encryptedPassword = encryptPassword(payload.password);
+    register: async (req, res) => {
+        const {username, email, password} = req.body;
+        let encryptedPassword = encryptPassword(password);
 
-        UserModel.createUser(
-            Object.assign(payload, {password: encryptedPassword})
-        ).then((user) => {
-            //generate accesstoken
-            const accessToken = generateAccessToken(payload.username, user.id);
+        try{
+            //check if username and email exist
+            const userExists = await pool.query(queries.checkUsernameEmail, [username, email]);
 
-            return res.status(200).json({
-                status: true,
-                data: {
-                    user: user.toJSON(),
-                    token: accessToken,
-                }
-            });
-        })
-        .catch((err) => {
-            return res.status(500).json({
-                status: false,
-                error: err,
+            if(userExists.rows.length > 0){
+                return res.status(400).json({error: "Username/email already exists"})
+            }
+            //register user in db and create accessToken
+            const newUser = await pool.query(queries.register, [username, email, encryptedPassword]);
+            const userId = newUser.rows[0].id;
+            const accessToken = generateAccessToken(username, userId);
+
+            res.status(201).json({status: true, user: newUser.rows[0], token: accessToken})
+
+        }catch(e){
+            console.log(e.message);
+            res.status(500).json({
+                error: "Internal Server Error"
             })
-        })
+        }
     },
 
     //login User
-    login: (req, res) => {
+    login: async (req, res) => {
         const {username, password} = req.body;
 
-        UserModel.findUser({ username })
-        .then((user) => {
-            //Return error if username not found
-            if(!user){
+        try{
+            //check if username exists
+            const checkUser = await pool.query(queries.checkUser, [username])
+            if(checkUser.rows.length === 0){
                 return res.status(400).json({
-                    status: false,
-                    error: {
-                        message: 'Username not found!'
-                    }
-                });
+                    error: "User does not exist"
+                })
             }
 
-            const encryptedPassword = encryptPassword(password);
-
-            //Return error if password is false
-            if(user.password !== encryptedPassword) {
+            //compare hashed passwords
+            let encryptedPassword = encryptPassword(password);
+            if(checkUser.rows[0].password !== encryptedPassword){
                 return res.status(400).json({
-                    status: false,
-                    error: {
-                        message: 'Password did not match!'
-                    }
-                });
+                    error: "Password not Valid"
+                })
             }
 
-            //create accessToken
-            const accessToken = generateAccessToken(user.username, user.id);
+            //generate token
+            const userId = checkUser.rows[0].id;
+            const accessToken = generateAccessToken(username, userId);
 
-            return res.status(200).json({
-                status: true,
-                data: {
-                    user: user.toJSON(),
-                    token: accessToken,
-                }
-            });
-        })
-        .catch((err) => {
-            return res.status(500).json({
-                status: false,
-                error: err,
+            res.status(201).json({status: true, user: checkUser.rows[0], token: accessToken})
+
+        }catch(e){
+            console.log(e.message);
+            res.status(500).json({
+                error: "Internal Server Error"
             })
-        })
+        }
+
+        
     }
 }
   
