@@ -37,21 +37,21 @@ module.exports = {
     //register User
     register: async (req, res) => {
         const {username, email, password} = req.body;
-        let encryptedPassword = encryptPassword(password);
 
         try{
             //check if username and email exist
             const userExists = await pool.query(queries.checkUsernameEmail, [username, email]);
 
             if(userExists.rows.length > 0){
-                return res.status(400).json({error: "Username/email already exists"})
+                return res.status(400).json({error: "Username / email already exists"})
             }
-            //register user in db and create accessToken
-            const newUser = await pool.query(queries.register, [username, email, encryptedPassword]);
-            const userId = newUser.rows[0].id;
-            const accessToken = generateAccessToken(username, userId);
 
-            res.status(201).json({status: true, user: newUser.rows[0], token: accessToken})
+            //register user in db and create accessToken
+            let encryptedPassword = encryptPassword(password);
+            const verificationToken = crypto.randomBytes(32).toString('hex');
+            const newUser = await pool.query(queries.register, [username, email, encryptedPassword, verificationToken]);
+
+            res.status(201).json({status: true, user: newUser.rows[0], msg: "Verify Email Adress"})
 
         }catch(e){
             console.log(e.message);

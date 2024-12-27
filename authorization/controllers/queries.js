@@ -1,4 +1,4 @@
-const register  = "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *";
+const register  = "INSERT INTO users (username, email, password, verification_token) VALUES ($1, $2, $3, $4) RETURNING *";
 const checkUsernameEmail = "SELECT * FROM users WHERE username = $1 OR email = $2";
 const checkUser = "SELECT * FROM users WHERE username = $1";
 
