@@ -1,3 +1,8 @@
+CREATE DATABASE snapshare;
+
+-- Switch to the newly created database
+\c snapshare;
+
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(30) NOT NULL UNIQUE,
