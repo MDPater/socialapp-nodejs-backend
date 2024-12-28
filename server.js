@@ -5,7 +5,7 @@ const port = process.env.PORT;
 
 
 // Express Routes Import
-const AuthorizationRoutes = require("./authorization/routes");
+const AuthorizationRoutes = require("./src/authorization/routes");
 
 app.get('/status', (req, res) => {
     const status = {

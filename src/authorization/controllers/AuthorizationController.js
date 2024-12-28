@@ -2,7 +2,7 @@ require('dotenv').config()
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const pool = require('../../db');
+const pool = require('../../../db');
 const queries = require('./queries');
 const { error } = require('console');
 
