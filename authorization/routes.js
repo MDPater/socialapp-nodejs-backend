@@ -18,4 +18,6 @@ router.post(
     AuthorizationController.login
 );
 
+router.get("/verify-email", AuthorizationController.verifyEmail);
+
 module.exports = router;

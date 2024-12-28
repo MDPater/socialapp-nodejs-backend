@@ -1,4 +1,5 @@
 require('dotenv').config()
+const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const pool = require('../../db');
@@ -7,6 +8,29 @@ const { error } = require('console');
 
 const jwtSecret = process.env.JWTSECRET;
 const jwtExpirationInSeconds = process.env.JWT_EXPIRATION_IN_SECONDS;
+
+//Create and send Verification email
+const sendVerificationEmail = async (email, token) => {
+    //set Email Transport variables
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD,
+        },
+        from: process.env.EMAIL_USER,
+    });
+
+    const verificationLink = `${process.env.API_URL}/auth/verify-email?token=${token}`;
+
+    const mailOptions = {
+        to: email,
+        subject: 'Snap Share Verification',
+        text: `Please verify your email by clicking on the link: ${verificationLink}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+}
 
 
 //Access Token using username and userId for authentication
@@ -46,10 +70,13 @@ module.exports = {
                 return res.status(400).json({error: "Username / email already exists"})
             }
 
-            //register user in db and create accessToken
+            //register user in db and create verificationToken
             let encryptedPassword = encryptPassword(password);
             const verificationToken = crypto.randomBytes(32).toString('hex');
             const newUser = await pool.query(queries.register, [username, email, encryptedPassword, verificationToken]);
+
+            //send verification email
+            await sendVerificationEmail(email, verificationToken);
 
             res.status(201).json({status: true, user: newUser.rows[0], msg: "Verify Email Adress"})
 
@@ -67,8 +94,8 @@ module.exports = {
 
         try{
             //check if username exists
-            const checkUser = await pool.query(queries.checkUser, [username])
-            if(checkUser.rows.length === 0){
+            const userExists = await pool.query(queries.userExistsname, [username])
+            if(userExists.rows.length === 0){
                 return res.status(400).json({
                     error: "User does not exist"
                 })
@@ -76,17 +103,17 @@ module.exports = {
 
             //compare hashed passwords
             let encryptedPassword = encryptPassword(password);
-            if(checkUser.rows[0].password !== encryptedPassword){
+            if(userExists.rows[0].password !== encryptedPassword){
                 return res.status(400).json({
                     error: "Password not Valid"
                 })
             }
 
             //generate token
-            const userId = checkUser.rows[0].id;
+            const userId = userExists.rows[0].id;
             const accessToken = generateAccessToken(username, userId);
 
-            res.status(201).json({status: true, user: checkUser.rows[0], token: accessToken})
+            res.status(201).json({status: true, user: userExists.rows[0], token: accessToken})
 
         }catch(e){
             console.log(e.message);
@@ -96,6 +123,41 @@ module.exports = {
         }
 
         
+    },
+
+    //verify user
+    verifyEmail: async (req,res) =>{
+        const {token} = req.query;
+
+        if(!token){
+            return res.status(400).json({
+                error: "Invalid or Missing token"
+            })
+        }
+
+        try{
+            //find user with verification token
+            const user = await pool.query(queries.checkVerificationToken, [token]);
+            if(user.rows.length === 0) {
+                return res.status(400).json({
+                    status: false,
+                    error: "Invalid or Expired token"
+                })
+            }
+
+            //update user to verified
+            await pool.query(queries.verifyUser, [true, null, user.rows[0].id]);
+
+            return res.status(200).json({
+                msg: "Email verified succesfully."
+            })
+
+        } catch(e) {
+            console.log(e.message);
+            res.status(500).json({
+                error: "Internal Server Error"
+            })
+        }
     }
 }
   
