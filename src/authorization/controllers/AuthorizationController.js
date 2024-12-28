@@ -4,9 +4,9 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const pool = require('../../../db');
 const queries = require('./queries');
-const { error } = require('console');
 
-const jwtSecret = process.env.JWTSECRET;
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
 //Create and send Verification email
 const sendVerificationEmail = async (email, token) => {
@@ -31,7 +31,6 @@ const sendVerificationEmail = async (email, token) => {
     await transporter.sendMail(mailOptions);
 }
 
-
 //Access Token using username and userId for authentication
 const generateAccessToken = (username, userId) => {
     return jwt.sign(
@@ -39,7 +38,7 @@ const generateAccessToken = (username, userId) => {
             id: userId,
             username: username
         }, 
-        jwtSecret,
+        ACCESS_TOKEN_SECRET,
         {
             expiresIn: '15m'
         }
@@ -53,7 +52,7 @@ const generateRefreshToken = (username, userId) => {
             id: userId,
             username: username
         }, 
-        jwtSecret,
+        REFRESH_TOKEN_SECRET,
         {
             expiresIn: '90d'
         }
@@ -134,6 +133,8 @@ module.exports = {
             //generate token
             const accessToken = generateAccessToken(username, user.id);
             const refreshToken = generateRefreshToken(username, user.id);
+
+            await pool.query(queries.createSession, [user.id, refreshToken])
 
             res.status(201).json({status: true, accessToken: accessToken, refreshToken: refreshToken})
 
