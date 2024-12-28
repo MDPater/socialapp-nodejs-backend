@@ -9,3 +9,10 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE user_sessions (
+    id SERIAL PRIMARY KEY, 
+    user_id INT NOT NULL,
+    refresh_token VARCHAR(255) NOT NULL UNIQUE,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);

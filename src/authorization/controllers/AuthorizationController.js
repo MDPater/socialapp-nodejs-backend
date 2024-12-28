@@ -7,7 +7,6 @@ const queries = require('./queries');
 const { error } = require('console');
 
 const jwtSecret = process.env.JWTSECRET;
-const jwtExpirationInSeconds = process.env.JWT_EXPIRATION_IN_SECONDS;
 
 //Create and send Verification email
 const sendVerificationEmail = async (email, token) => {
@@ -37,12 +36,26 @@ const sendVerificationEmail = async (email, token) => {
 const generateAccessToken = (username, userId) => {
     return jwt.sign(
         {
-            userId,
-            username
+            id: userId,
+            username: username
         }, 
         jwtSecret,
         {
-            expiresIn: jwtExpirationInSeconds
+            expiresIn: '15m'
+        }
+    );
+};
+
+//Refresh Token
+const generateRefreshToken = (username, userId) => {
+    return jwt.sign(
+        {
+            id: userId,
+            username: username
+        }, 
+        jwtSecret,
+        {
+            expiresIn: '90d'
         }
     );
 };
@@ -94,26 +107,35 @@ module.exports = {
 
         try{
             //check if username exists
-            const userExists = await pool.query(queries.userExistsname, [username])
+            const userExists = await pool.query(queries.checkUsername, [username])
             if(userExists.rows.length === 0){
                 return res.status(400).json({
                     error: "User does not exist"
                 })
             }
 
+            const user = userExists.rows[0];
+
             //compare hashed passwords
             let encryptedPassword = encryptPassword(password);
-            if(userExists.rows[0].password !== encryptedPassword){
+            if(user.password !== encryptedPassword){
                 return res.status(400).json({
                     error: "Password not Valid"
                 })
             }
 
-            //generate token
-            const userId = userExists.rows[0].id;
-            const accessToken = generateAccessToken(username, userId);
+            //check if user is verified
+            if(!user.verified ){
+                return res.status(400).json({
+                    error: "User not Verified"
+                })
+            }
 
-            res.status(201).json({status: true, user: userExists.rows[0], token: accessToken})
+            //generate token
+            const accessToken = generateAccessToken(username, user.id);
+            const refreshToken = generateRefreshToken(username, user.id);
+
+            res.status(201).json({status: true, accessToken: accessToken, refreshToken: refreshToken})
 
         }catch(e){
             console.log(e.message);
