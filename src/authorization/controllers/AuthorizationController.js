@@ -28,7 +28,7 @@ const sendVerificationEmail = async (email, token) => mailjet.post('send', { ver
 				"TemplateLanguage": true,
 				"Subject": "Snap Share verification",
 			    "Variables": {
-			        "verifytoken": token
+			        "token": token
 			    }
 		}
 	]
@@ -91,7 +91,9 @@ module.exports = {
             const newUser = await pool.query(queries.register, [username, email, encryptedPassword, verificationToken]);
 
             //send verification email
-            await sendVerificationEmail(email, verificationToken);
+            await sendVerificationEmail(email, verificationToken)
+                .then((result) => {console.log(result.body)})
+                .catch((err) => {console.log(err.statusCode)});
 
             res.status(201).json({status: true, user: newUser.rows[0], msg: "Verify Email Adress"})
 
