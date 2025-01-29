@@ -1,35 +1,38 @@
-require('dotenv').config()
-const nodemailer = require("nodemailer");
+require('dotenv').config();
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const pool = require('../../../db');
 const queries = require('./queries');
+const mailjet = require("node-mailjet").connect(
+    process.env.MAILJET_PUBLIC_KEY,
+    process.env.MAILJET_SECRET_KEY
+);
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
 //Create and send Verification email
-const sendVerificationEmail = async (email, token) => {
-    //set Email Transport variables
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD,
-        },
-        from: process.env.EMAIL_USER,
-    });
-
-    const verificationLink = `${process.env.API_URL}/auth/verify-email?token=${token}`;
-
-    const mailOptions = {
-        to: email,
-        subject: 'Snap Share Verification',
-        text: `Please verify your email by clicking on the link: ${verificationLink}`,
-    };
-
-    await transporter.sendMail(mailOptions);
-}
+const sendVerificationEmail = async (email, token) => mailjet.post('send', { version: 'v3.1' }).request({
+    "Messages":[
+		{
+			"From": {
+				"Email": "support@snap-share.net",
+				"Name": "Snap Share"
+			},
+			"To": [
+				{
+					"Email": email,
+				}
+			],
+				"TemplateID": 6681435,
+				"TemplateLanguage": true,
+				"Subject": "Snap Share verification",
+			    "Variables": {
+			        "verifytoken": token
+			    }
+		}
+	]
+})
 
 //Access Token using username and userId for authentication
 const generateAccessToken = (username, userId) => {
@@ -115,18 +118,18 @@ module.exports = {
 
             const user = userExists.rows[0];
 
+            //check if user is verified
+            if(!user.verified ){
+                return res.status(400).json({
+                    error: "User not Verified"
+                })
+            }
+
             //compare hashed passwords
             let encryptedPassword = encryptPassword(password);
             if(user.password !== encryptedPassword){
                 return res.status(400).json({
                     error: "Password not Valid"
-                })
-            }
-
-            //check if user is verified
-            if(!user.verified ){
-                return res.status(400).json({
-                    error: "User not Verified"
                 })
             }
 
