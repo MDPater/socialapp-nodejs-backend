@@ -3,7 +3,9 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const pool = require('../../../db');
 const queries = require('./queries');
-const mailjet = require("node-mailjet").connect(
+const Mailjet = require("node-mailjet")
+
+const mailjet = Mailjet.apiConnect(
     process.env.MAILJET_PUBLIC_KEY,
     process.env.MAILJET_SECRET_KEY
 );
