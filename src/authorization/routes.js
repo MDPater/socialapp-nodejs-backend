@@ -20,6 +20,6 @@ router.post(
 
 router.get("/verify-email", AuthorizationController.verifyEmail);
 
-router.get("/", AuthorizationController);
+router.get("/notme", AuthorizationController.notme);
 
 module.exports = router;

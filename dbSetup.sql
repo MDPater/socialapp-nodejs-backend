@@ -19,7 +19,7 @@ CREATE TABLE users (
 CREATE TABLE user_sessions (
     id SERIAL PRIMARY KEY,
     ip VARCHAR(30),
-    user_role VARCHAR(10) DEFAULT user,
+    user_role VARCHAR(10) DEFAULT 'user',
     user_id INT NOT NULL,
     session_id VARCHAR(255) NOT NULL UNIQUE,
     login_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

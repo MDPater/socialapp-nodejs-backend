@@ -10,7 +10,7 @@ const AuthorizationRoutes = require("./src/authorization/routes");
 app.get('/status', (req, res) => {
     const status = {
         "status": "running",
-        "version": "1.0.0",
+        "version": "0.1.0",
         "owner": "MDPater"
     }
     res.send(status)

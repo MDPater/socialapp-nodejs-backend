@@ -10,6 +10,8 @@ const mailjet = Mailjet.apiConnect(
     process.env.MAILJET_SECRET_KEY
 );
 
+const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+
 //Create and send Verification email
 const sendVerificationEmail = async (email, token) => mailjet.post('send', { version: 'v3.1' }).request({
     "Messages":[
@@ -40,21 +42,7 @@ const generateAccessToken = (username, userId) => {
             id: userId,
             username: username
         }, 
-        ACCESS_TOKEN_SECRET,
-        {
-            expiresIn: '15m'
-        }
-    );
-};
-
-//Refresh Token
-const generateRefreshToken = (username, userId) => {
-    return jwt.sign(
-        {
-            id: userId,
-            username: username
-        }, 
-        REFRESH_TOKEN_SECRET,
+        accessTokenSecret,
         {
             expiresIn: '90d'
         }
@@ -134,13 +122,12 @@ module.exports = {
                 })
             }
 
-            //generate token
+            //generate token and create session
             const accessToken = generateAccessToken(username, user.id);
-            const refreshToken = generateRefreshToken(username, user.id);
 
-            await pool.query(queries.createSession, [user.id, refreshToken])
+            await pool.query(queries.createSession, [user.id, accessToken])
 
-            res.status(201).json({status: true, accessToken: accessToken, refreshToken: refreshToken})
+            res.status(201).json({status: true, accessToken: accessToken})
 
         }catch(e){
             console.log(e.message);
@@ -177,6 +164,41 @@ module.exports = {
 
             return res.status(200).json({
                 msg: "Email verified succesfully."
+            })
+
+        } catch(e) {
+            console.log(e.message);
+            res.status(500).json({
+                error: "Internal Server Error"
+            })
+        }
+    },
+
+    //delete user entry if email is false
+    notme: async (req, res) =>{
+
+        const {token} = req.query;
+        if(!token){
+            return res.status(400).json({
+                error: "Invalid or Missing token"
+            })
+        }
+
+        try{
+            //find user with verification token
+            const user = await pool.query(queries.checkVerificationToken, [token]);
+            if(user.rows.length === 0) {
+                return res.status(400).json({
+                    status: false,
+                    error: "Invalid or Expired token"
+                })
+            }
+
+            //delete user from DB
+            await pool.query(queries.deleteUser, [user.rows[0].id]);
+
+            return res.status(200).json({
+                msg: "All data connected to this email has been deleted"
             })
 
         } catch(e) {
