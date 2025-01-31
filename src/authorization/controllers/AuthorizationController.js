@@ -3,13 +3,14 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const pool = require('../../../db');
 const queries = require('./queries');
-const mailjet = require("node-mailjet").connect(
-    process.env.MAILJET_PUBLIC_KEY,
-    process.env.MAILJET_SECRET_KEY
-);
+const Mailjet = require('node-mailjet')
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
+const mailjet = Mailjet.apiConnect(
+    process.env.MAILJET_PUBLIC_KEY,
+    process.env.MAILJET_SECRET_KEY
+);
 
 //Create and send Verification email
 const sendVerificationEmail = async (email, token) => mailjet.post('send', { version: 'v3.1' }).request({
@@ -26,7 +27,7 @@ const sendVerificationEmail = async (email, token) => mailjet.post('send', { ver
 			],
 				"TemplateID": 6681435,
 				"TemplateLanguage": true,
-				"Subject": "Snap Share verification",
+				"Subject": "Email Verification",
 			    "Variables": {
 			        "token": token
 			    }
