@@ -8,6 +8,7 @@ const verifyUser = "UPDATE users SET verified = $1, verification_token = $2 WHER
 const deleteUser = "DELETE FROM users WHERE id= $1";
 
 const createSession = "INSERT INTO user_sessions (user_id, session_id) VALUES ($1, $2)";
+const deleteSession = "DELETE FROM user_sessions WHERE session_id = $1 RETURNING *"
 
 
 module.exports = {
@@ -17,5 +18,6 @@ module.exports = {
     checkVerificationToken,
     verifyUser,
     deleteUser,
-    createSession
+    createSession,
+    deleteSession
 }

@@ -1,6 +1,7 @@
 const router = require("express").Router();
 
 const validatePayload = require("../common/middleware/validatePayload");
+const validateAuthentication = require("../common/middleware/validateAuthentication");
 const AuthorizationController = require("./controllers/AuthorizationController");
 
 const loginPayload = require("./payload/loginPayload");
@@ -17,6 +18,8 @@ router.post(
     validatePayload.verify(loginPayload),
     AuthorizationController.login
 );
+
+router.post("/logout", validateAuthentication.verify, AuthorizationController.logout)
 
 router.get("/verify-email", AuthorizationController.verifyEmail);
 

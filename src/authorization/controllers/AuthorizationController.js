@@ -3,7 +3,8 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const pool = require('../../../db');
 const queries = require('./queries');
-const Mailjet = require("node-mailjet")
+const Mailjet = require("node-mailjet");
+const { error } = require('ajv/dist/vocabularies/applicator/dependencies');
 
 const mailjet = Mailjet.apiConnect(
     process.env.MAILJET_PUBLIC_KEY,
@@ -137,6 +138,31 @@ module.exports = {
         }
 
         
+    },
+
+    //logout user and delete session
+    logout: async (req, res) => {
+        console.log("authenticated "+ req.user.id);
+        console.log("token: " +req.user.token);
+        
+        try {
+            //delete token from user session table
+            const deletedSession = await pool.query(queries.deleteSession, [req.user.token]);
+
+            if(deletedSession.rows.length === 0){
+                return res.status(400).json({
+                    status: false,
+                    error: "no session with that token"
+                })
+            }
+
+            return res.status(200).json({
+                status: true,
+                msg: "logout succesful"
+            })
+        } catch (error) {
+            console.log(error);
+        }
     },
 
     //verify user
