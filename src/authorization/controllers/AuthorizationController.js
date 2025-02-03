@@ -1,5 +1,6 @@
 require('dotenv').config();
 const jwt = require("jsonwebtoken");
+const os = require("os");
 const crypto = require("crypto");
 const pool = require('../../../db');
 const queries = require('./queries');
@@ -122,10 +123,11 @@ module.exports = {
                 })
             }
 
-            //generate token and create session
+            //generate token with device info and create session
             const accessToken = generateAccessToken(username, user.id);
+            const deviceInfo = os.platform() + " " + os.hostname();
 
-            await pool.query(queries.createSession, [user.id, accessToken])
+            await pool.query(queries.createSession, [deviceInfo, user.id, accessToken])
 
             res.status(201).json({status: true,msg: "Login Succesful", accessToken: accessToken})
 

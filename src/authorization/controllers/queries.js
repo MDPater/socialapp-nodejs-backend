@@ -7,7 +7,7 @@ const checkVerificationToken = "SELECT * FROM users WHERE verification_token = $
 const verifyUser = "UPDATE users SET verified = $1, verification_token = $2 WHERE id = $3";
 const deleteUser = "DELETE FROM users WHERE id= $1";
 
-const createSession = "INSERT INTO user_sessions (user_id, session_id) VALUES ($1, $2)";
+const createSession = "INSERT INTO user_sessions (info, user_id, session_id) VALUES ($1, $2, $3)";
 const deleteSession = "DELETE FROM user_sessions WHERE session_id = $1 RETURNING *"
 
 
