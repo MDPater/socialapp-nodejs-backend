@@ -82,7 +82,7 @@ module.exports = {
                 .then((result) => {console.log(result.body)})
                 .catch((err) => {console.log(err.statusCode)});
 
-            res.status(201).json({status: true, user: newUser.rows[0], msg: "Verify Email Adress"})
+            res.status(201).json({status: true, msg: "Verify Email Adress", data: newUser.rows[0].email})
 
         }catch(e){
             console.log(e.message);
@@ -127,7 +127,7 @@ module.exports = {
 
             await pool.query(queries.createSession, [user.id, accessToken])
 
-            res.status(201).json({status: true, accessToken: accessToken})
+            res.status(201).json({status: true,msg: "Login Succesful", accessToken: accessToken})
 
         }catch(e){
             console.log(e.message);

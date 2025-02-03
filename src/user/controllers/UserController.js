@@ -9,7 +9,7 @@ module.exports = {
 
         try {
 
-            const result = await pool.query(queries.getUser, [id]);
+            const result = await pool.query(queries.getUserData, [id]);
 
             if(result.rows.length === 0){
                 return res.status(404).json({
