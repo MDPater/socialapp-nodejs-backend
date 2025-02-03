@@ -16,6 +16,15 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE followers (
+    id SERIAL PRIMARY KEY,
+    following_id INT NOT NULL,
+    follower_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_following FOREIGN KEY (following_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_follower FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE TABLE user_sessions (
     id SERIAL PRIMARY KEY,
     ip VARCHAR(30),
@@ -27,3 +36,21 @@ CREATE TABLE user_sessions (
     active_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE TABLE party_room (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(30) NOT NULL,
+    description VARCHAR(255),
+    thumbnail VARCHAR(255),
+    owner_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_owner FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE room_participants (
+    id SERIAL PRIMARY KEY,
+    room_id INT NOT NULL,
+    participant_id INT NOT NULL,
+    CONSTRAINT fk_room FOREIGN KEY (room_id) REFERENCES party_room(id) ON DELETE CASCADE,
+    CONSTRAINT fk_participant FOREIGN KEY (participant_id) REFERENCES users(id) ON DELETE CASCADE
+)
