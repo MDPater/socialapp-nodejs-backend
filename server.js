@@ -6,6 +6,8 @@ const port = process.env.PORT;
 
 // Express Routes Import
 const AuthorizationRoutes = require("./src/authorization/routes");
+const UserRoutes = require("./src/user/routes");
+const validateAuthentication = require('./src/common/middleware/validateAuthentication');
 
 app.get('/status', (req, res) => {
     const status = {
@@ -17,7 +19,9 @@ app.get('/status', (req, res) => {
 })
 
 app.use(express.json());
+
 app.use("/auth", AuthorizationRoutes);
+app.use("/users", validateAuthentication.verify, UserRoutes);
 
 app.listen(port, () => {
   console.log("Server Listening on PORT:", port);

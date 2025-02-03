@@ -1,5 +1,7 @@
 const router = require("express").Router();
 
-const validateAuthentication = require("../common/middleware/validateAuthentication");
+const UserController = require("./controllers/UserController");
 
-router.get("/users", validateAuthentication.verify,)
+router.get("/:id", UserController.getUser);
+
+module.exports = router;

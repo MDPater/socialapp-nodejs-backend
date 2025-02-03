@@ -19,19 +19,21 @@ module.exports = {
             //check DB for session
             const userSession = await pool.query(queries.checkSession, [bearerToken]);
             if(userSession.rows.length === 0){
-                return res.status(400).json({
+                return res.status(401).json({
                     status: false,
                     error: "no session found"
                 })
             }
 
-            jwt.verify(bearerToken, accessToken, (err, user) => {
-                if (err) return res.sendStatus(403);  // Invalid token
-        
-                req.user = user;
-                req.user.token = bearerToken;
-                return next();
-            })
+            const user = jwt.verify(bearerToken, accessToken)
+
+            console.log("user: " + user.id +":"+ user.username +" authenticated call");
+
+            req.user = user;
+            req.user.token = bearerToken;
+
+            await pool.query(queries.updateTokenActive, [bearerToken]);
+            return next();
         } catch (error) {
             console.log(error);
         }

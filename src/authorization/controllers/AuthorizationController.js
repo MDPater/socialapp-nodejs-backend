@@ -4,7 +4,6 @@ const crypto = require("crypto");
 const pool = require('../../../db');
 const queries = require('./queries');
 const Mailjet = require("node-mailjet");
-const { error } = require('ajv/dist/vocabularies/applicator/dependencies');
 
 const mailjet = Mailjet.apiConnect(
     process.env.MAILJET_PUBLIC_KEY,
