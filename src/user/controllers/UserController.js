@@ -26,5 +26,27 @@ module.exports = {
         } catch (error) {
             console.log(error)
         }
+    },
+
+    //update user
+    updateUser: async (req, res) => {
+        const {id} = req.params;
+
+        if(req.user.id == id){
+            return res.status(201).json({
+                status: true,
+                msg: "Authenticated for this Account"
+            })
+        }
+
+        return res.status(403).json({
+            status: false,
+            error: "Not Authenticated for this Account"
+        })
+    },
+
+    //delete user
+    deleteUser: async (req, res) => {
+
     }
 }
