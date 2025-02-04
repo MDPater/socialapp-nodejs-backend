@@ -1,5 +1,11 @@
 const getUserData = "SELECT id, username, profile_picture, bio FROM users WHERE id = $1";
+const getUserFollowers = "SELECT * FROM followers WHERE following_id = $1"; 
+const getUserFollowing = "SELECT * FROM followers WHERE follower_id = $1";
+const getUserSessions = "SELECT * FROM user_sessions WHERE user_id = $1";
 
 module.exports = {
-    getUserData
+    getUserData,
+    getUserFollowers,
+    getUserFollowing,
+    getUserSessions
 }

@@ -9,23 +9,52 @@ module.exports = {
 
         try {
 
-            const result = await pool.query(queries.getUserData, [id]);
+            const user = await pool.query(queries.getUserData, [id]);
+            const followers = await pool.query(queries.getUserFollowers, [id]);
+            const following = await pool.query(queries.getUserFollowing, [id]);
 
-            if(result.rows.length === 0){
+            if(user.rows.length === 0){
                 return res.status(404).json({
                     status: false,
                     error: "ID not Found"
                 })
             }
 
+            //set user Follower & Following number
+            const userFollowers = followers.rows.length;
+            const userFollowing = following.rows.length;
+
             return res.status(200).json({
                 status: true,
                 msg: "Auth succesful",
-                data: result.rows[0]
+                data: `{
+                ${user.rows[0]}
+                followers: ${userFollowers},
+                following: ${userFollowing}
+                }`
             })
         } catch (error) {
             console.log(error)
         }
+    },
+
+    getUserSessions: async (req, res) => {
+        const {id} = req.params;
+
+        if(req.user.id == id){
+            const sessions = await pool.query(queries.getUserSessions, [req.user.id]);
+
+            return res.status(200).json({
+                status: true,
+                msg: "Authenticated for this Account",
+                data: sessions.rows
+            })
+        }
+
+        return res.status(403).json({
+            status: false,
+            error: "Not Authenticated for this Account"
+        })
     },
 
     //update user
