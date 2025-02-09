@@ -37,6 +37,14 @@ module.exports = {
     }
   },
 
+  //update user
+  updateUser: async (req, res) => {
+    return res.status(201).json({
+      status: true,
+      msg: "Authenticated for this Account",
+    });
+  },
+
   //get all sessions of a user
   getUserSessions: async (req, res) => {
     try {
@@ -84,23 +92,6 @@ module.exports = {
     } catch (error) {
       console.log(error);
     }
-  },
-
-  //update user
-  updateUser: async (req, res) => {
-    const { id } = req.params;
-
-    if (req.user.id == id) {
-      return res.status(201).json({
-        status: true,
-        msg: "Authenticated for this Account",
-      });
-    }
-
-    return res.status(403).json({
-      status: false,
-      error: "Not Authenticated for this Account",
-    });
   },
 
   //delete user

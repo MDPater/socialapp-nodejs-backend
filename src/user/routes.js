@@ -2,12 +2,12 @@ const router = require("express").Router();
 
 const UserController = require("./controllers/UserController");
 
-router.get("/current-profile", UserController.currentProfile);
+router.get("/me", UserController.currentProfile);
+
+router.patch("/me", UserController.updateUser);
 
 router.get("/sessions", UserController.getUserSessions);
 
 router.get("/:id", UserController.getUser);
-
-router.put("/:id", UserController.updateUser);
 
 module.exports = router;
