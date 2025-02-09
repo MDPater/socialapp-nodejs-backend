@@ -165,7 +165,7 @@ module.exports = {
 
   //logout user and delete session
   logout: async (req, res) => {
-    console.log("authenticated " + req.user.id);
+    console.log("logout: " + req.user.id);
     console.log("token: " + req.user.token);
 
     try {
