@@ -45,6 +45,9 @@ module.exports = {
     });
   },
 
+  //delete user
+  deleteUser: async (req, res) => {},
+
   //get all sessions of a user
   getUserSessions: async (req, res) => {
     try {
@@ -93,7 +96,4 @@ module.exports = {
       console.log(error);
     }
   },
-
-  //delete user
-  deleteUser: async (req, res) => {},
 };
